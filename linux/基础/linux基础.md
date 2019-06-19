@@ -137,7 +137,7 @@ userdel xm
 
 ## 查询用户信息
 ### 基本用法
-id 用户名
+id 用户名  
 ![用户信息](/linux/linuxfile/用户信息.png)  
 uid：用户id  
 gid：用户所属组id  
@@ -149,10 +149,10 @@ cat /etc/passwd
 
 ## 切换用户
 ### 基本用法
-su - 切换用户名
+su - 切换用户名  
 ![切换用户](/linux/linuxfile/用户切换.png)  
 从普通用户向root进行切换的时候需要重新输入密码  
-![切换到root](/linux/linuxfile/切换到root.png)
+![切换到root](/linux/linuxfile/切换到root.png)  
 exit  
 返回到原来的用户  
 ![返回用户](/linux/linuxfile/返回用户.png)  
@@ -168,20 +168,20 @@ groupadd 组名
 ## 删除组
 groupdel 组名
 ## 增加用户时直接加入上组
-useradd -g 用户组 用户名
+useradd -g 用户组 用户名  
 ![tjyhdz](/linux/linuxfile/添加用户直接添加到组.png)  
 ## 用该用户组
-usermod -g 用户组 用户名
+usermod -g 用户组 用户名  
 ![gbyhz](/linux/linuxfile/改变用户组.png)  
 
 # 6. 用户和组相关的文件
 /etc/passwd：用户配置文件（用户互信息）  
-![zxsyyh2](/linux/linuxfile/cxsyyh2.png)
+![zxsyyh2](/linux/linuxfile/cxsyyh3.png)
 
 /etc/group：组配置文件（组信息）  
 ![zxx](/linux/linuxfile/组信息.png)
 
-/etc/shadow：口令配置文件（密码和登录信息,，包括密码，是加密）
+/etc/shadow：口令配置文件（密码和登录信息,，包括密码，是加密）  
 ![sd](/linux/linuxfile/shadow.png)
 
 
