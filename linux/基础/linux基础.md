@@ -108,7 +108,7 @@ sync:将内存的数据同步到磁盘[关机或者重启之前使用]
 基本规则：  
 1. linux中有很多用户和组，每个用户至少数以一个组。  
 2. 用户家目录概念：/home/目录下有各个创建的家目录，当用户登录时，会自动的进入到自己的家目录。
-![用户和组](/linux\linuxfile\用户组.png)
+![用户和组](/linux/linuxfile/用户组.png)
 
 ## 添加用户
 ### 基本语法
@@ -138,51 +138,51 @@ userdel xm
 ## 查询用户信息
 ### 基本用法
 id 用户名
-![用户信息](/linux\linuxfile\用户信息.png)  
+![用户信息](/linux/linuxfile/用户信息.png)  
 uid：用户id  
 gid：用户所属组id  
 groups：用户所属组名称
 
 cat /etc/passwd  
 查询所有用户
-![cxsyyh3](/linux\linuxfile\cxsyyh3.png)
+![cxsyyh3](/linux/linuxfile/cxsyyh3.png)
 
 ## 切换用户
 ### 基本用法
 su - 切换用户名
-![切换用户](/linux\linuxfile\用户切换.png)  
+![切换用户](/linux/linuxfile/用户切换.png)  
 从普通用户向root进行切换的时候需要重新输入密码  
-![切换到root](/linux\linuxfile\切换到root.png)
+![切换到root](/linux/linuxfile/切换到root.png)
 exit  
 返回到原来的用户  
-![返回用户](/linux\linuxfile\返回用户.png)  
+![返回用户](/linux/linuxfile/返回用户.png)  
 whoami
 查询当前用户  
-![qdyh](/linux\linuxfile\当前用户.png)
+![qdyh](/linux/linuxfile/当前用户.png)
 # 5. 组管理
 ## 基本介绍
 类似于角色，系统可以对有多个共性的多个用户进行统一的管理。
 ## 增加组
 groupadd 组名  
-![创建组](/linux\linuxfile\创建组.png)  
+![创建组](/linux/linuxfile/创建组.png)  
 ## 删除组
 groupdel 组名
 ## 增加用户时直接加入上组
 useradd -g 用户组 用户名
-![tjyhdz](/linux\linuxfile\添加用户直接添加到组.png)  
+![tjyhdz](/linux/linuxfile/添加用户直接添加到组.png)  
 ## 用该用户组
 usermod -g 用户组 用户名
-![gbyhz](/linux\linuxfile\改变用户组.png)  
+![gbyhz](/linux/linuxfile/改变用户组.png)  
 
 # 6. 用户和组相关的文件
 /etc/passwd：用户配置文件（用户互信息）  
-![zxsyyh2](/linux\linuxfile\cxsyyh2.png)
+![zxsyyh2](/linux/linuxfile/cxsyyh2.png)
 
 /etc/group：组配置文件（组信息）  
-![zxx](/linux\linuxfile\组信息.png)
+![zxx](/linux/linuxfile/组信息.png)
 
 /etc/shadow：口令配置文件（密码和登录信息,，包括密码，是加密）
-![sd](/linux\linuxfile\shadow.png)
+![sd](/linux/linuxfile/shadow.png)
 
 
 
