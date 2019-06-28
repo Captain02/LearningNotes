@@ -430,4 +430,74 @@ chgrp 组名 文件名
 (1)usermod -g 组名 用户名  
 (2)usermod -d 目录名 用户名 改变用户登录的初始目录  
 2. 应用实例  
-创建一个土匪组(bandit)将tom这个用户从原来的police组修改到土匪(bandit)组。
+创建一个土匪组(bandit)将tom这个用户从原来的police组修改到土匪(bandit)组。  
+ ![6](/linux/linuxfile/6.png)   
+## 权限的基本介绍
+ls -l中显示内容如下  
+待修改  
+ ![8](/linux/linuxfile/8.png)  
+ ## rwx权限详解
+ 1. rwx作用到文件  
+ >1. [r] 代表可读(read):可以读取，查看  
+ >2. [w] 代表写(write):可以修改，但是不代表可以删除文件，删除一个文件的前提条件是对该文件所在的目录有写权限，才能删除该文件。  
+ >3. [x] 代表可执行(execute):可以被执行
+2. rwx作用到目录  
+>1. [r]代表可读(read):可以读取，ls查看目录内容  
+>2. [w]代表可写(write):可以修改，目录内创建+删除+重命名目录  
+>3. [x]代表可执行(execute):可以进入该目录  
+
+*注意：r=4、w=2、x=1,因此rwx=4+2+1=7*
+## 修改权限-chmod
+基本说明：  
+通过chmod指令，可以修改文件或者目录的权限  
+1. 第一种方式：+、-、=变更权限  
+u:所有者  
+g:所有组  
+o:其他人  
+a:所有人(u、g、o的总和)  
+(1) chmod u=rwx,g=rx,o=x 文件目录名  
+(2) chmod o+w 文件目录名  
+(3) chmod a-x 文件目录名  
+> 练习  
+>(1) 给abc文件的所有者读写执行的权限，给所在组读执行权限。  
+> ![9](/linux/linuxfile/9.png)  
+>(2) 给abc文件的所有者除去执行的权限，增加组写的权限  
+>![10](/linux/linuxfile/10.png)  
+>(3) 给abc文件的所有用户添加读的权限  
+>![11](/linux/linuxfile/11.png)  
+2. 第二种方式：通过数字变更权限  
+r=4、w=2,、x=1，rwx=4+2+1=7  
+chmod u=rwx,g=rx,o=x 文件名  
+相当于chmod 751 文件目录名  
+>练习  
+>将/home/tom/abc文件的权限修改成rwxr-xr-x,使用数组的方式。   
+>rwx = 4+2+1=7  
+>r-x = 4+1=5  
+>chmod 755 /home/tom/abc  
+## 修改文件所有者-chown  
+基本介绍  
+chown newowner file  
+chown newowner:newgroup file 改变用户的所有者和所有组  
+-R 若果是目录 则使其下所有子文件或者目录递归生效  
+>练习  
+>1. 将/home/abc.txt文件的所有者修改成tom  
+>![12](/linux/linuxfile/12.png)  
+>2. 请将/home/kkk目录下的文件和目录的所有者都修改成tom   
+>![13](/linux/linuxfile/13.png)  
+## 修改文件所在组-chgrp
+chgrp newgroup file 改变文件的所有组  
+>1. 请将/home/abc.txt文件的所在组修改成bandit(土匪)  
+>chgrp bandit /home/abc.txt  
+>2. 请将/home/kkk目录下所有文件和目录所在组都修改成bandit(土匪)  
+>chgrp -R bandit /home/abc.txt  
+
+
+## 小结：
+>1. chown-修改文件所属用户  
+>2. chgrp-修改文件所属组  
+>3. usermod-修改用户所在组  
+>4. chmod-修改文件或者目录的权限 
+
+# 定时任务调度  
+## 原理图  
+![14](/linux/linuxfile/14.png)  
