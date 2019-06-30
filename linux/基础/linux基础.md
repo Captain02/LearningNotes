@@ -345,7 +345,7 @@ find [搜索范围] [选项]
 locate指令可以快速定位文件路径，locate指令利用实现建立的系统中所有文件名称以及路径的locate数据库实现快速定位给定的文件。locate指令无需遍历整个文件系统，查询速度较快。  
 基本语法  
 locate搜索文件  
-*特别注意：由于locate指令基于数据库进行查询，所以第一次运行前，必须使用updatedb指令创建locate数据库。  
+*特别注意：由于locate指令基于数据库进行查询，所以第一次运行前，必须使用updatedb指令创建locate数据库。*  
 3. grep 指令和管道指令 |  
 基本用法  
 grep[选项] 查找内容 源文件  
@@ -554,5 +554,56 @@ data >> /tmp/mydate
 4).MBR最大只支持2TB，但拥有最好的兼容性  
 2. gtp分区：  
 1).支持无限读个主分区（但操作系统可能限制，比如windos下最多128个分区）  
-2).最大只会18EB的大容量（EB=1024PB,1PB=1024GB）  
-3).windows7 64位以后支持gtp
+2).最大只会18EB的大容量（EB=1024PB,1PB=1024GB） 
+3).windows7 64位以后支持gtp  
+## Linux分区
+### 原理介绍
+1) linux来说无论有几个分区，分给那一目录，它归根结底就只有一个根目录，一个独立且唯一的文件结构，Linux中每个分区都是用来组成文件系统的一部分。
+2) linux采用了一种叫“挂载”的处理方法，他的整个文件系统中包含了一整他的文件和目录，且将一个分区和一个目录连接起来，这时要载入一个分区将使它的存储空间在一个目录下获得  
+3) 示意图：  
+![15](/linux/linuxfile/15.png)  
+### 硬盘说明
+1. Linux硬盘分IDE硬盘和SCSI硬盘，目前基本上是SCSI硬盘。  
+2. 对于IDE硬盘，驱动器标识为“hdx~”,其中"hd"表名分区所设备的类型，这里是指IDE硬盘了，x为盘号(a为基本盘,b为基本从属盘,c为辅助主盘,为辅助从属盘),~代表分区，前四个分区用数字1到4标识，他们是主分区和扩展分区，从5开始就是逻辑分区，例如：hda3标识为第一个IDE硬盘上的第三个主分区或扩展分区，hdb2表示为第二个IDE硬盘上的第二个主分区或扩展分区。  
+3. 对于SCSI硬盘则表示为"sdx"，SCSI硬盘是用"sd"来表示分区所在设备的类型的，其余则和IDE硬盘的表示方法一样。  
+4. 使用lsblk -f指令进行查看分区情况  
+![17](/linux/linuxfile/17.png)  
+### 如何增加一块新硬盘
+1)虚拟机添加硬盘  
+2)分区 fdisk /dev/sdb  
+3)格式化 mkfs -t ext4 /dev/sdb1  
+4)挂载 先创建一个/home/newdisk，挂载到mount /dev/sdb1 /home/newdisk  
+5)设置可以自动挂载  
+vim /etc/fatab  
+/dev/sdb1  /home/newdisk ext4 defaults 0 0  
+### 磁盘使用情况查询
+1. 查询系统整个磁盘的使用情况  
+df -h  
+![18](/linux/linuxfile/18.png)  
+2. 查询指定目录占用磁盘的情况  
+du -h  
+-s 指定目录占用大小汇总  
+-h 带计量单位  
+-a 含文件  
+--max-depth=1 子目录深度  
+-c 列出明细的同时，增加汇总值  
+![19](/linux/linuxfile/19.png)  
+3. 磁盘工作情况  
+1)统计/home文件夹下文件的个数  
+![20](/linux/linuxfile/20.png)  
+2)统计/home文件夹下目录的个数  
+![21](/linux/linuxfile/21.png)  
+3)统计/home文件夹下文件的个数，包括子文件夹里的  
+![22](/linux/linuxfile/22.png)  
+4)统计文件夹下目录的个数，包括子文件夹里的  
+![23](/linux/linuxfile/23.png)  
+5)以树状显示目录结构  
+![24](/linux/linuxfile/24.png)  
+# Linux网络配置
+## Linu网络配置原理图
+目前我们的网络采用的是NAT模式  
+![25](/linux/linuxfile/25.png)  
+## 指定固定ip  
+编辑网络配置文件：vim /etc/sysconfig/network-scripts/ifcfg-enp0s3  
+![26](/linux/linuxfile/26.png)  
+重启网络服务：service network restart  
