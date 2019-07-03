@@ -654,3 +654,49 @@ centos7 可以使用ls -l  systemctl list-units --type=service
 2)chkconfig 服务名  --list  
 3)chkconfig --level 5 服务名 on/off(设置)  
 ![33](/linux/linuxfile/33.png)  
+### 进程的监控指令 top
+基本语法  
+top [选项]  
+选项说明  
+选项|功能
+-|-
+-d秒数|指定top命令间隔几秒更新，默认是3秒在top命令的交互模式当中可以执行的命令
+-i|使top不显示任何闲置或者僵死进程
+-p|通过指定监控进程id来仅仅监控某个进程的状态  
+交互操作说明  
+操作|功能
+-|-
+P|以CPU使用率进行排序，默认就是此项
+M|以内存的使用率进行排序
+N|以PID进行排序
+Q|退出top  
+![34](/linux/linuxfile/34.png)  
+### 查看系统网络情况 netstat
+基本语法  
+netstat [选项]  
+netstat -anp  
+-an 按一定顺序排列输出  
+-p 显示那个进程在调用  
+![35](/linux/linuxfile/35.png)  
+# RPM和YUM的管理
+## rpm
+查询已安装的rpm列表 rpm -qa|grep xx  
+*注意：格式中带有noarch代表32/64通用*  
+rpm -ql xxx查看软件安装位置  
+rpm -e xxx卸载  
+rpm -e --nodeps xx强制删除  
+安装rpm包  
+rpm -ivh xxx  
+i = install安装  
+v = verbose提示  
+h = hash进度条  
+
+## yum
+查询yum服务器是否有需要安装的软件  
+yum list|grep xx软件列表  
+安装指定的yum包  
+yum install xxx下载安装  
+yum list installed查看已安装的软件包
+![36](/linux/linuxfile/36.png)  
+
+
