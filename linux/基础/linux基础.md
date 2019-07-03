@@ -634,3 +634,23 @@ kill [选项]
 例如：  
 1. kill -9  
 2. killall gedit 通过进程名称来终止进程  
+## 服务管理
+### service管理指令
+service 服务名 [start|stop|restart|reload|status]  
+7.0以后使用systemctl    
+### 使用案例
+1)查看当前防火墙的状况，关闭和重启防火墙。  
+![31](/linux/linuxfile/31.png)  
+可以使用netstat -tunlp命令来查看端口占用的情况  
+![32](/linux/linuxfile/32.png)  
+查看服务列表  
+centos6 可以使用ls -l /etc/init.d  
+centos7 可以使用ls -l  systemctl list-units --type=service  
+### chkconfig命令  
+介绍  
+通过chkconfig命令可以给每个服务的各个运行级别设置自启动/关闭  
+基本语法  
+1)查看服务 chkconfig --list|grep xxx  
+2)chkconfig 服务名  --list  
+3)chkconfig --level 5 服务名 on/off(设置)  
+![33](/linux/linuxfile/33.png)  
