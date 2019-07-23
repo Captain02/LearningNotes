@@ -83,3 +83,36 @@ $?(功能描述:最后一次执行的命令的返回状态，如果这个变量�
 ![50](/linux/linuxfile/50.png)  
 案例二：请求出命令行的两个参数的和  
 ![51](/linux/linuxfile/51.png)  
+# 条件判断
+## 基本语法
+[condition](注意condition前后要有空格)  
+*注意非空返回true，可使用$?验证(0为true，>1为false)*  
+## 应用实例
+[atguigu]返回true  
+[]返回false  
+[condition]&&echo OK || echo notok  
+# 条件判断
+## 常用判断条件
+1. 两个整数的比较  
+=字符串比较  
+-lt小于  
+-le小于等于  
+-eq等于  
+-gt大于  
+-ge大于等于  
+-ne不等于  
+2. 按照文件权限进行判断  
+-r有读的权限  
+-w有写的权限  
+-x有执行的权限  
+3. 按照文件类型进行判断  
+-f文件存在并且是一个常规的文件  
+-e文件存在  
+-d文件存在并是一个目录  
+## 应用实例
+案例一："ok"是否等于"ok"  
+![52](/linux/linuxfile/52.png)  
+案例二：23是否大于等于22  
+![53](/linux/linuxfile/53.png)  
+案例三：/home/shell/目录中的文件是否存在aa.txt  
+![54](/linux/linuxfile/54.png)  
