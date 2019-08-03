@@ -607,6 +607,24 @@ du -h
 编辑网络配置文件：vim /etc/sysconfig/network-scripts/ifcfg-enp0s3  
 ![26](/linux/linuxfile/26.png)  
 重启网络服务：service network restart  
+## 防火墙添加端口
+开端口命令：firewall-cmd --zone=public --add-port=80/tcp --permanent  
+重启防火墙：systemctl restart firewalld.service  
+命令含义：  
+--zone #作用域  
+--add-port=80/tcp  #添加端口，格式为：端口/通讯协议  
+--permanent   #永久生效，没有此参数重启后失效  
+## 查看防火墙设置开机自启是否成功
+systemctl is-enabled firewalld.service;echo $?  
+![56](/linux/linuxfile/56.png)  
+## 检查防火墙状态是否打开  
+firewall-cmd --state  
+## 自启防火墙  
+systemctl start firewalld.service  
+## 设置开机自启  
+systemctl enable firewalld.service  
+## 重启防火墙
+systemctl restart firewalld.service  
 # 进程管理
 基本介绍  
 1. 在Linux中，每个执行的程序都称为一个进程，每一个进程都分配一个ID号。  
