@@ -56,3 +56,298 @@
 (4) 当当网Dubbox
 3. 各大服务框架对比  
 ![2](/SpringCloud/SpringCloudFile/2.png)  
+# springCloud概述
+## 什么是springCloud
+![3](/SpringCloud/SpringCloudFile/3.png)  
+SpringCloud=分布式微服务架构下的一站式解决方案，是各个微服务架构落地技术的集合，俗称微服务全家桶。  
+## SpringBoot和SpringCloud是什么关系
+  SpringBoot专注于快速方便的开发单个个体微服务。  
+  SpringCloud是关注全局的微服务协调整理治理框架，它将SpringBoot开发的一个个单体微服务整合起并管理起来，为各个微服务之间提供，配置管理、服务发现、断路器、路由、微代理、事件总线、全局所、决策竞选、分布式会话等等集成服务。  
+  SpringBoot可以离开SpringCloud独立使用开发项目，但是SpringCloud离不开SpringBoot，属于依赖关系。  
+  SpringBoot专注于快速、方便的开发单个微服务个体，SpringCloud关注全局的服务治理框架。  
+  ## SpiringCloud作用有哪些
+  1. Distributed/versioned configuration(分布式/版本控制配置)  
+  2. Service registration and discovery(服务注册与发现)  
+  3. Routing(路由)  
+  4. Service-to-service calls(服务到服务的调用)  
+  5. Load balancing(负载均衡配置)  
+  6. Circuit Breakers(断路器)  
+  7. Distributed messaging(分布式消息管理)  
+  ## 下载地址
+  官方网站：http://projects.spring.io/spring-cloud/  
+  参考书：  
+    1. https://springcloud.cc/spring-cloud-netflix.html  
+    2. springcloud中国社区  
+    3. springcloud中文网  
+    API：  
+    1. http://cloud.spring.io/spring-cloud-static/Dalston.SR1/  
+    2. https://springcloud.cc/spring-cloud-dalston.html  
+# 案例分析
+## 总体介绍 
++ 以部门(Dept)模块做一个微服务通用案例，Consumer消费者(Client)，通过REST调用Provider提供者(Server)提供的服务。  
+## 构建步骤
+1. 构建maven工程micro-cloud-project  
+pom文件如下  
+```xml
+<groupId>micro.cloud</groupId>
+    <artifactId>micro-cloud</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <junit.version>4.12</junit.version>
+        <log4j.version>1.2.17</log4j.version>
+        <lombok.version>1.16.18</lombok.version>
+        <eureka.client.version>2.1.1.RELEASE</eureka.client.version>
+    </properties>
+
+    <!--dependencyManagement 只是生命版本和坐标，不实际引入，还需子模块引入（不必添加版本）-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Greenwich.SR3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.1.8.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>1.0.31</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>1.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>1.2.3</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+                <version>${eureka.client.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!--各个子模块-->
+    <modules>
+        <module>micro-api</module>
+        <module>micro-eureka-7001</module>
+        <module>micro-provider-8001</module>
+        <module>micro-provider-8002</module>
+        <module>micro-consumer-9001</module>
+        <module>micro-provider-hystrix-8003</module>
+        <module>micro-api-feign</module>
+        <module>micro-consumer-feign-9002</module>
+        <module>micro-zuul-6001</module>
+        <module>micro-config-server-5001</module>
+        <module>micro-provider-config-8004</module>
+        <module>micro-eureka-config-7002</module>
+        <module>micro-consumer-config-9003</module>
+        <module>micro-consumer-feign-config-9004</module>
+        <module>micro-zuul-config-6002</module>
+    </modules>
+
+```  
+这里pom文件值为各个子模块的父工程，统一声明jar包的版本，```</dependencyManagement>```只是声明jar包的版本，不实际引入jar包。  
+2. 创建公共的Api工程，工程中只包含实体类，目录结构如下：  
+![4](/SpringCloud/SpringCloudFile/4.png)  
+pom文件如下：  
+```xml
+    <parent>
+        <artifactId>micro-cloud</artifactId>
+        <groupId>micro.cloud</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>micro-api</artifactId>
+```   
+实体类如下：  
+```java
+package com.entity;
+
+public class Dept {
+    private Integer id;
+    private String deptname;
+    private String descs;
+    private String db;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getDeptname() {
+        return deptname;
+    }
+
+    public void setDeptname(String deptname) {
+        this.deptname = deptname;
+    }
+
+    public String getDescs() {
+        return descs;
+    }
+
+    public void setDescs(String descs) {
+        this.descs = descs;
+    }
+
+    public String getDb() {
+        return db;
+    }
+
+    public void setDb(String db) {
+        this.db = db;
+    }
+}
+```
+## Eureka  
+### 什么是Eureka  
+Eureka是Netflix开发的，一个基于REST服务的，服务注册与发现的组件  
+它主要包括两个组件：Eureka Server和Eureka Client  
++ Eureka Client:一个Java客户端，用于简化与Eureka Server的交互(通常就是微服务中的客户端和服务端)  
++ Eureka Server：提供服务注册和发现的能力(通常就是微服务中的注册中心)  
+![5](/SpringCloud/SpringCloudFile/5.png)   
+各个微服务启动时，会通过Eureka Client向Eureka Server注册自己，会存储改服务的信息也就是所，每个微服务的客户端和服务端，都会注册到Eureka Server，这就衍生出了微服务相互识别。  
++ 同步：每个Eureka Server同时也是Eureka Client(逻辑上的)duoge Eureka Server之间通过复制的方式完成服务注册表的同步，形成Eureka的高可用。  
++ 识别：Eurek Client会缓存Eureka Server中的信息，即使所有Eureka Client都宕掉，服务消费者认可使用缓存中的信息找到服务提供者  
++ 续约：微服务会周期性(默认30s)地想EurekaServer发送心跳Renew(续约)信息(类似于hearbeat)  
++ 续期：Eureka Server会定期(默认60s)执行一次失效服务检测功能，他检查超过一定时间(默认90s)没有Renew的微服务，发现则会注销该微服务节点。  
+SpringCloud已经把Eureka集成在其子项目Spring Cloud Netflix里面  
+
+### 单个Eureka的部署  
+1. 目录结构  
+![6](/SpringCloud/SpringCloudFile/6.png)  
+2. pom文件  
+```xml
+<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>micro.cloud</groupId>
+		<artifactId>micro-cloud</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<groupId>com.micro.cloud</groupId>
+	<artifactId>micro-eureka-7001</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>micro-eureka-7001</name>
+	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+```
+3. 配置application  
+```yml
+server:
+  port: 7001
+
+eureka:
+  instance:
+    hostname: eureka7001.com #eureka服务端的实例名称
+  client:
+    register-with-eureka: false     #false表示不向注册中心注册自己。
+    fetch-registry: false     #false表示自己端就是注册中心，我的职责就是维护服务实例，并不需要去检索服务
+    service-url:
+      #单机
+      #设置与Eureka Server交互的地址查询服务和注册服务都需要依赖这个地址（单机）。
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      #defaultZone: http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/   #集群配置
+
+```
+4. 开启Eureka Server   
+```java
+@SpringBootApplication
+@EnableEurekaServer
+public class MicroEureka7001Application {
+	public static void main(String[] args) {
+		SpringApplication.run(MicroEureka7001Application.class, args);
+	}
+}
+```  
+开启成功后访问地址会有Eureka主页  
+![7](/SpringCloud/SpringCloudFile/7.png)  
+Eureka支持集群，配置多个Eureka只需要修改新建的工程中修改yml配置文件即可  
+
+### Zookeeper和Eureka的比较  
+作为服务注册中心，Eureka比Zookeeper好在哪里  
+CAP理论之处，一个分布式系统不可能同时满足C(一致性)、A(可用性)和P(分区容错性)。由于分区容错性P在是分布式系统中必须要保证的，因此我们只能在A和C之间进行权衡。  
+因此  
++ Zookeeper保证的是CP，Eureka则是AP。  
+当向注册中心查询服务列表使时，我们可以容忍注册中心返回的是几分钟以前的注册信息，但不能接受服务直接宕掉不可用。也就是说，服务注册功能对可用性的要求要高于一致性。但是zookeeper会出现这样一种情况，当master节点因为网络故障与其他节点失去联系时，剩余节点会重新进行leader选举。问题在于，选举leader的时间太长，30~120s，且选举期间整个zookeeper集群都是不可用的，这就导致在选举期间注册服务摊款。在云部署的环境下，因网络问题使得zookeeper集群失去master节点是较大概率发生的事，虽然服务能够最终回复，但是漫长的选举时间导致的注册长期不可用是不能容忍的。  
++ Eureka保证AP  
+Eureka看明白了这一点，因此在设计时就优先保证可用性。Eureka各个节点都是平等的，几个节点挂掉不会影响正常节点的工作，剩余的节点依然可以提供注册和查询服务。而Eureka注册如果发现连接失败，则会自动切换至其他节点，只要有一台Eureka还在，技能保证注册服务可用性(保证可用性),只不过查到的信息可能不是最新的(不保证强一致性)。除此之外，Eureka还有一种自我保护机制，如果在15分钟内超过85%的节点都没有正常的心跳，那么Eureka就认为客户端与注册中心出现了网络故障，此时会出现以下几种情况：  
+1. Eureka不再从注册表中移除 因为长时间没收到心跳而应该过期的服务。  
+2. Eureka仍然能够接受新服务的注册和查询请求，但是不会被同步到其他节点上(即保证当前节点依然可用)  
+3. 当网络稳定时，，当前实例新的注册信息会被同步到其他的节点中  
+因此，Eureka可以很好的应对网络故障导致部分节点失去联系的情况。而不会像zookeeper那样是整个注册服务瘫痪。
