@@ -350,4 +350,190 @@ Eureka看明白了这一点，因此在设计时就优先保证可用性。Eurek
 1. Eureka不再从注册表中移除 因为长时间没收到心跳而应该过期的服务。  
 2. Eureka仍然能够接受新服务的注册和查询请求，但是不会被同步到其他节点上(即保证当前节点依然可用)  
 3. 当网络稳定时，，当前实例新的注册信息会被同步到其他的节点中  
-因此，Eureka可以很好的应对网络故障导致部分节点失去联系的情况。而不会像zookeeper那样是整个注册服务瘫痪。
+因此，Eureka可以很好的应对网络故障导致部分节点失去联系的情况。而不会像zookeeper那样是整个注册服务瘫痪。  
+## Ribbin 负载均衡
+Spring Cloud Ribbon是基于Netflix Ribbon实现的一套客户端负载均衡的工具。  
+加单的说，Ribbon是Netflix发布的开源项目，主要功能是提供客户端的软件负载均衡算法，将Netflix中的中间层无服务链接在一起。Ribbon客户端组件提供一系列完善的配置项如连接超时，重试等。简单的说，就是在配置文件中列出LoadBalancer(简称LB)后面所有的机器，Ribbon会自动的帮助你基于某种规则(如简单轮训，随机链接等)去链接这些机器。我们也很容易使用Ribbon实现自定义的负载均衡算法。  
+负载均衡分为集中式LB和进程内LB  
+集中式LB：  
+即在服务的消费方和提供方之间使用独立的LB设施(可以是硬件，如F5, 也可以是软件，如nginx), 由该设施负责把访问请求通过某种策略转发至服务的提供方；  
+进程内LB：  
+将LB逻辑集成到消费方，消费方从服务注册中心获知有哪些地址可用，然后自己再从这些地址中选择出一个合适的服务器。  
+Ribbon就属于进程内LB，它只是一个类库，集成于消费方进程，消费方通过它来获取到服务提供方的地址。  
+
+### 核心组件IRule
+根据特定算法中从服务列表中选取一个要访问的服务  
+1. RoundRobinRule轮询  
+2. RandpmRule随机  
+3. AvailabilityFilteringRule会先过滤掉多余多次访问故障而处于断路器跳闸状态的服务，还有并发链接数量超过阈值的服务，然后对剩余的服务列表按照轮训策略进行访问  
+4. WeightedResponseTimeRule根据平均响应事件计算所有服务的权重，响应时间越快服务权重越大，被选中的概率越高，刚启动时候如果统计信息不足，则使用RoundRobinRule策略，等统计信息足够，会切换到WeightedResponseTimeRule  
+5. RetryRule先按照RoundRobinRule的策略获取服务，如果获取服务失败则在指定时间内会进行重试，获得可用的服务  
+6. RestAvailableRule会先过滤掉有多次访问故障而处于断路器跳闸状态的服务，然后选择一个并发量最小的服务。
+7. ZoneAvoidanceRule默认规则，复合判断server所在区域的性能和server的可用性选择服务器。  
+### 开启Ribbon
+```java
+public class ConfigBean {
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate getRestTemplate() {
+
+        return new RestTemplate();
+    }
+
+}
+```
+### 自定义规则
+1. 创建自定义规则类  
+```java
+@Configuration
+public class MySelfRule
+{
+  @Bean
+  public IRule myRule()
+  {
+   return new RandomRule();//Ribbon默认是轮询，我自定义为随机
+  }
+}
+
+```
+2. 使用自定义规则  
+```java
+@RibbonClient(name="MICROSERVICECLOUD-DEPT",configuration=MySelfRule.class)
+```
+3. 注意细节  
+官方文档明确给出了警告：
+这个自定义配置类不能放在@ComponentScan所扫描的当前包下以及子包下，否则我们自定义的这个配置类就会被所有的Ribbon客户端所共享，也就是说我们达不到特殊化定制的目的了。  
+![8](/SpringCloud/SpringCloudFile/8.png)  
+## Feign 负载均衡
+1. 添加maven依赖  
+```xml
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+2. 声明feign的服务  
+```java
+@FeignClient(value = "MICRO-PROVIDER", fallbackFactory = DeptClientServiceFallbackFactory.class)
+public interface DeptService {
+
+    //服务中方法的映射路径,去注册中心寻找其他的相同映射的服务，实现服务在均衡
+    @RequestMapping(value = "/getlist", method = RequestMethod.GET)
+    public List<Dept> getList();
+}
+```
+3. 开启Feign  
+```java
+@SpringBootApplication
+@EnableEurekaClient
+@EnableFeignClients(basePackages = {"com.micro.api.feign.microapifeign.dept.service"})
+@ComponentScan(value = {"com.micro.api.feign.microapifeign.dept.service","com.micro.consumer.feign.microconsumerfeign9002.controller"})
+public class MicroConsumerFeign9002Application {
+	public static void main(String[] args) {
+		SpringApplication.run(MicroConsumerFeign9002Application.class, args);
+	}
+}
+```
+## hystrix 服务降级与熔断  
+### 分布式系统面临的问题  
+服务雪崩
+多个微服务之间调用的时候，假设微服务A调用微服务B和微服务C，微服务B和微服务C又调用其它的微服务，这就是所谓的“扇出”。如果扇出的链路上某个微服务的调用响应时间过长或者不可用，对微服务A的调用就会占用越来越多的系统资源，进而引起系统崩溃，所谓的“雪崩效应”.
+ 
+对于高流量的应用来说，单一的后端依赖可能会导致所有服务器上的所有资源都在几秒钟内饱和。比失败更糟糕的是，这些应用程序还可能导致服务之间的延迟增加，备份队列，线程和其他系统资源紧张，导致整个系统发生更多的级联故障。这些都表示需要对故障和延迟进行隔离和管理，以便单个依赖关系的失败，不能取消整个应用程序或系统。
+ 
+ 
+备注：一般情况对于服务依赖的保护主要有3中解决方案：
+ 
+（1）熔断模式：这种模式主要是参考电路熔断，如果一条线路电压过高，保险丝会熔断，防止火灾。放到我们的系统中，如果某个目标服务调用慢或者有大量超时，此时，熔断该服务的调用，对于后续调用请求，不在继续调用目标服务，直接返回，快速释放资源。如果目标服务情况好转则恢复调用。
+ 
+（2）隔离模式：这种模式就像对系统请求按类型划分成一个个小岛的一样，当某个小岛被火少光了，不会影响到其他的小岛。例如可以对不同类型的请求使用线程池来资源隔离，每种类型的请求互不影响，如果一种类型的请求线程资源耗尽，则对后续的该类型请求直接返回，不再调用后续资源。这种模式使用场景非常多，例如将一个服务拆开，对于重要的服务使用单独服务器来部署，再或者公司最近推广的多中心。
+ 
+（3）限流模式：上述的熔断模式和隔离模式都属于出错后的容错处理机制，而限流模式则可以称为预防模式。限流模式主要是提前对各个类型的请求设置最高的QPS阈值，若高于设置的阈值则对该请求直接返回，不再调用后续资源。这种模式不能解决服务依赖的问题，只能解决系统整体资源分配问题，因为没有被限流的请求依然有可能造成雪崩效应。
+ 
+ ### 服务降级  
+ Hystrix服务降级，其实就是线程池中单个线程障碍处理，防止单个线程请求时间太长，导致资源长期被占有而得不到释放，从而导致线程池被快速占用完，导致服务崩溃。  
+ Hystrix能解决如下问题：  
+ 1. 请求超时降级，线程资源不足降级，降级之后可以返回自定义数据  
+ 2. 线程池隔离降级，分布式服务可以针对不同的服务使用不同的线程池，从而互不影响  
+ 3. 自动触发降级与恢复  
+ 4. 实现请求缓存和请求合并  
+ ### 服务熔断  
+ 熔断模式：这种模式主要是参考电路熔断，如果一条线路电压过高，保险丝会熔断。放到我们的系统中，如果某个目标服务调用慢或者有大量超时时，此时，熔断该服务的调用，对于后续调用请求，不再继续调用目标服务，直接放回，快速释放资源。如果目标服务情况好转则恢复调用。  
+ 1. 开启Hystrix
+ ```java
+@SpringBootApplication
+@EnableEurekaClient //本服务启动后会自动注册进eureka服务中
+@EnableDiscoveryClient //服务发现
+@EnableCircuitBreaker//对hystrixR熔断机制的支持
+public class MicroProviderHystrix8003Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MicroProviderHystrix8003Application.class, args);
+	}
+
+}
+ ```
+ 2. controller  
+ ```java
+@RestController
+public class DeptController {
+
+    @Autowired
+    DeptService deptService;
+
+    @GetMapping("/getlist/{id}")
+    @HystrixCommand(fallbackMethod = "processHystrix_Get")
+    public Dept getList(@PathVariable("id") Integer id) {
+        List<Dept> list = deptService.list();
+        Dept dept = list.get(id);
+        if (dept == null) {
+            throw new RuntimeException("该ID：" + id + "没有没有对应的信息");
+        }
+        return dept;
+    }
+
+    public Dept processHystrix_Get(@PathVariable("id") Integer id) {
+        Dept dept = new Dept();
+        dept.setId(10);
+        dept.setDeptname("没有没有对应的信息--@HystrixCommand");
+        dept.setDb("0");
+        dept.setDescs("没有没有对应的信息--@HystrixCommand");
+        return dept;
+    }
+
+}
+ ```
+ 从上述内容可以看出，每增加一个方法便会增加一个回调方法，这样会导致方法膨胀，所以增加公共配置类  
+ ```java
+@Component
+public class DeptClientServiceFallbackFactory implements FallbackFactory<DeptService> {
+
+    @Override
+    public DeptService create(Throwable throwable) {
+        return new DeptService() {
+            @Override
+            public List<Dept> getList() {
+                Dept dept = new Dept();
+                dept.setDb(String.valueOf(3));
+                dept.setDeptname("3");
+                dept.setDescs("3");
+                dept.setId(3);
+                List<Dept> data = new ArrayList<>();
+                data.add(dept);
+                return data;
+            }
+        };
+    }
+}
+ ```
+ 3. server接口声明使用实现类  
+ ```java
+@FeignClient(value = "MICRO-PROVIDER", fallbackFactory = DeptClientServiceFallbackFactory.class)
+public interface DeptService {
+
+    //服务中方法的映射路径,去注册中心寻找其他的相同映射的服务，实现服务在均衡
+    @RequestMapping(value = "/getlist", method = RequestMethod.GET)
+    public List<Dept> getList();
+}
+ ```
