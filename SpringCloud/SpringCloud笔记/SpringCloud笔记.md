@@ -537,3 +537,134 @@ public interface DeptService {
     public List<Dept> getList();
 }
  ```
+
+ ## zuul路由网关  
+ 1. 开启zuul网关  
+ ```java
+@SpringBootApplication
+@EnableZuulProxy
+public class MicroZuul6001Application {
+    public static void main(String[] args) {
+        SpringApplication.run(MicroZuul6001Application.class, args);
+    }
+}
+ ```
+ 2. 配置zuul网关
+ ```yml
+zuul:
+  prefix: /micro
+  ignored-services: '*'
+  routes: 
+    mydept.serviceId: micro-provider
+    mydept.path: /mydept/**
+ ```
+
+ ### config 配置中心  
+ 1. config配置  
+ ```yml
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  # 配置中心
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config/
+ ```
+ 2. config-consumer配置  
+ ```yml
+ server:
+  port: 9003
+ ```
+  2. config-feign配置  
+ ```yml
+eureka:
+  client:
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://eureka7003.com:7003/eureka/
+
+spring:
+  application:
+    name: application-consumer-fegin-config
+ ```
+
+3. config-provider配置  
+ ```yml
+server:
+  port: 8004
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource            # 当前数据源操作类型
+    driver-class-name: com.mysql.jdbc.Driver              # mysql驱动包
+    url: jdbc:mysql://localhost:3306/mirodemo?serverTimezone=UTC  # 数据库名称
+    username: root
+    password: 123456
+    dbcp2:
+      min-idle: 5                                           # 数据库连接池的最小维持连接数
+      initial-size: 5                                       # 初始化连接数
+      max-total: 5                                          # 最大连接数
+      max-wait-millis: 200
+eureka:
+  client: #客户端注册进eureka服务列表内
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka
+       #defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true
+
+mybatis:
+#  config-location: classpath:mybatis/mybatis.cfg.xml        # mybatis配置文件所在路径
+  type-aliases-package: com.atguigu.springcloud.entities    # 所有Entity别名类所在包
+  mapper-locations:
+  - classpath:mybatis/mapper/**/*.xml                       # mapper映射文件
+ ```
+4. config-zuul配置  
+ ```yml
+  #ignored-services: microservicecloud-dept
+  #同一网关区别？
+zuul:
+  prefix: /micro
+  ignored-services: '*'
+  routes:
+    mydept.serviceId: micro-provider
+    mydept.path: /mydept/**
+
+info:
+  app.name: atguigu-microcloud
+  company.name: www.atguigu.com
+  build.artifactId: $project.artifactId$
+  build.version: $project.version$
+ ```
+ 5. 其他服务引用config以provider为例  
+ ```yml
+spring:                            # 等待连接获取的最大超时时间
+  application:
+    name: micro-provider
+  profiles:
+    active: dev
+  cloud:
+    config:
+      fail-fast: true
+      name: application-micro-provider
+      profile: ${spring.profiles.active}
+      discovery:
+        enabled: true
+        service-id: config-server
+      uri: http://127.0.0.1:5001
+
+
+# 注册中心配置
+eureka:
+  client: #客户端注册进eureka服务列表内
+    service-url:
+       defaultZone: http://eureka7001.com:7001/eureka
+       #defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/
+  instance:
+    instance-id: micro-provider:${server.port}
+    prefer-ip-address: true     #访问路径可以显示IP地址
+ ```
