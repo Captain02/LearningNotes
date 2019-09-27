@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: application-micro-eureka
+  cloud:
+    config:
+      fail-fast: true
+      name: ${spring.application.name}
+      profile: dev
+      discovery:
+        enabled: true
+        service-id: eureka-config
+      uri: http://127.0.0.1:5001
+

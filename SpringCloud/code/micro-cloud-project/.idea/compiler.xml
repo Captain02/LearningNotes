@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="micro-api" />
+        <module name="micro-api-feign" />
+        <module name="micro-config-server-5001" />
+        <module name="micro-consumer-9001" />
+        <module name="micro-consumer-config-9003" />
+        <module name="micro-consumer-feign-9002" />
+        <module name="micro-consumer-feign-config-9004" />
+        <module name="micro-eureka-7001" />
+        <module name="micro-eureka-config-7002" />
+        <module name="micro-provider-8001" />
+        <module name="micro-provider-8002" />
+        <module name="micro-provider-config-8004" />
+        <module name="micro-provider-hystrix-8003" />
+        <module name="micro-zuul-6001" />
+        <module name="micro-zuul-config-6002" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="micro-api" target="1.8" />
+      <module name="micro-api-feign" target="1.8" />
+      <module name="micro-cloud-project" target="1.8" />
+      <module name="micro-config-server-5001" target="1.8" />
+      <module name="micro-consumer-9001" target="1.8" />
+      <module name="micro-consumer-config-9003" target="1.8" />
+      <module name="micro-consumer-feign-9002" target="1.8" />
+      <module name="micro-consumer-feign-config-9004" target="1.8" />
+      <module name="micro-eureka-7001" target="1.8" />
+      <module name="micro-eureka-config-7002" target="1.8" />
+      <module name="micro-provider-8001" target="1.8" />
+      <module name="micro-provider-8002" target="1.8" />
+      <module name="micro-provider-config-8004" target="1.8" />
+      <module name="micro-provider-hystrix-8003" target="1.8" />
+      <module name="micro-zuul-6001" target="1.8" />
+      <module name="micro-zuul-config-6002" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

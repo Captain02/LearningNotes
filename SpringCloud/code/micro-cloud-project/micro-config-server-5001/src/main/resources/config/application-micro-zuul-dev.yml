@@ -1,0 +1,17 @@
+
+
+  #ignored-services: microservicecloud-dept
+  #同一网关区别？
+zuul:
+  prefix: /micro
+  ignored-services: '*'
+  routes:
+    mydept.serviceId: micro-provider
+    mydept.path: /mydept/**
+
+info:
+  app.name: atguigu-microcloud
+  company.name: www.atguigu.com
+  build.artifactId: $project.artifactId$
+  build.version: $project.version$
+

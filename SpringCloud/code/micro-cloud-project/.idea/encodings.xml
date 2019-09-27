@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-api-feign" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-config-server-5001" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-consumer-9001" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-consumer-config-9003" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-consumer-feign-9002" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-consumer-feign-config-9004" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-eureka-7001" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-eureka-config-7002" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-provider-8001" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-provider-8002" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-provider-config-8004" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-provider-hystrix-8003" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-zuul-6001" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/micro-zuul-config-6002" charset="UTF-8" />
+  </component>
+</project>

@@ -1,0 +1,15 @@
+server:
+  port: 9002
+eureka:
+  client:
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka/
+
+spring:
+  application:
+    name: consumer-fegin
+feign:
+  hystrix:
+    enabled: true
+
