@@ -37,7 +37,7 @@ Nginx不仅可以做反向代理，实现负载均衡。还能用作正向代理
 ![4](/Nginx/nginxFile/4.png)  
 # 第二章 安装Nginx
 ## 进入nginx官网，下载  
-http://nginx.org/
+http://nginx.org/  
 ![5](/Nginx/nginxFile/5.png)  
 1. 安装pcre依赖  
 (1)联网下载pcre压缩文件依赖wget htp://downloads.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz
